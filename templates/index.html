@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CO2 & CH4 Concentration Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.0"></script>
+</head>
+<body>
+    <h1>주간 평균 CO2 농도</h1>
+    <canvas id="co2Chart"></canvas>
+
+    <h1>월간 평균 CH4 농도</h1>
+    <canvas id="ch4Chart"></canvas>
+
+    <script>
+        // Flask로부터 전달받은 데이터를 파싱
+        const co2Dates = JSON.parse('{{ co2_dates | tojson | safe }}');
+        const co2Averages = JSON.parse('{{ co2_averages | tojson | safe }}');
+        const ch4Dates = JSON.parse('{{ ch4_dates | tojson | safe }}');
+        const ch4Averages = JSON.parse('{{ ch4_averages | tojson | safe }}');
+
+        // CO2 그래프 생성
+        const ctxCo2 = document.getElementById('co2Chart').getContext('2d');
+        new Chart(ctxCo2, {
+            type: 'line',
+            data: {
+                labels: co2Dates,
+                datasets: [{
+                    label: 'CO2 농도 (ppm)',
+                    data: co2Averages,
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'year',  // 연도만 표시
+                            tooltipFormat: 'YYYY',  // 툴팁에 연도 표시
+                            displayFormats: {
+                                year: 'YYYY'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '년도'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        suggestedMin: 300,
+                        suggestedMax: 450,
+                        title: {
+                            display: true,
+                            text: 'CO2 농도 (ppm)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // CH4 그래프 생성
+        const ctxCh4 = document.getElementById('ch4Chart').getContext('2d');
+        new Chart(ctxCh4, {
+            type: 'line',
+            data: {
+                labels: ch4Dates,
+                datasets: [{
+                    label: 'CH4 농도 (ppb)',
+                    data: ch4Averages,
+                    borderColor: 'green',
+                    borderWidth: 2,
+                    fill: false,
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'year',  // 연도만 표시
+                            tooltipFormat: 'YYYY',
+                            displayFormats: {
+                                year: 'YYYY'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '년도'
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        suggestedMin: 1500,
+                        suggestedMax: 2000,
+                        title: {
+                            display: true,
+                            text: 'CH4 농도 (ppb)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
